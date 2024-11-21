@@ -1,9 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import { Image, SafeAreaView } from "react-native";
+import { Image} from "react-native";
+import { SafeAreaView } from "react-native";
 import { StyleSheet,View,Text,Pressable,ActivityIndicator } from "react-native";
 import { useState,useEffect } from "react";
 import { Link, router } from "expo-router";
-import {Stack} from "expo-router"
+
 
 
 // array that holds 2 strings rendered in the button
@@ -18,8 +19,6 @@ const buttonText = [
 export default function LandingScreen() {
   // state to keep track of the buttonText index
   const [currentTextIndex,setCurrentTextIndex] = useState(0);
-  // initial state of the loader
-  const [loading,setloading]=useState(false)
 
   // Use effect with timer to display each and every word in the buttonText
   useEffect(()=>{
@@ -33,23 +32,17 @@ export default function LandingScreen() {
     return()=>clearInterval(interval)
   },[])
 
-//  Navigation function with loader
-  // const handleNavigation = ()=>{
-  //   setloading(true);
 
-  //   setTimeout(()=>{
-  //     router.replace("./record");
-  //     setloading(false)
-  //   }, 1000)
-  // }
+  const handleLogin = ()=>{
+      router.replace("./login");
+  }
+  const handleRegister = ()=>{
+    router.replace("./register")
+  }
+
 
   return (
    <>
-   <Stack>
-    <Stack.Screen name="./login"/>
-    <Stack.Screen name="./register"/>
-   </Stack>
-   
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
             <View style={styles.container}>
@@ -78,13 +71,12 @@ export default function LandingScreen() {
                 <Text style={{textAlign:"center"}}>{buttonText[currentTextIndex]}</Text>
               </View>
               <View style={styles.buttonscontainer}>
-                  <Pressable>
-                    <Link style={styles.signupbutton} href="./login">Sign Up</Link>
+                  <Pressable onPress={()=>handleLogin()}>
+                    <Text style={styles.signupbutton}>Sign in</Text>
                   </Pressable>
-                  <Pressable>
-                    <Link style={styles.loginbutton} href="./register">Login</Link>
+                  <Pressable onPress={()=>handleRegister()}>
+                    <Text style={styles.loginbutton}>Login</Text>
                   </Pressable>
-                  {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>}
               </View>
                        
             </View>

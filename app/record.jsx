@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, Pressable, StyleSheet, StatusBar, ScrollView,Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet, StatusBar, ScrollView,Alert } from 'react-native';
+import { SafeAreaView } from "react-native";
 import { Audio } from 'expo-av';
 import { useEffect } from 'react';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';

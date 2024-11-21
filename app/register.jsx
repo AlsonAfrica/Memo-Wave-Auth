@@ -5,8 +5,8 @@ import { useState,useEffect } from "react";
 import { router } from "expo-router";
 import {Stack} from "expo-router";
 import { Link } from "expo-router";
-import { ScrollView, TextInput } from "react-native-web";
-
+import { ScrollView } from "react-native";
+import { TextInput } from "react-native";
 
 // array that holds 2 strings rendered in the button
 const buttonText = [
@@ -17,40 +17,10 @@ const buttonText = [
 
 
 
-export default function LoginScreen() {
-  // state to keep track of the buttonText index
-  const [currentTextIndex,setCurrentTextIndex] = useState(0);
-  // initial state of the loader
-  const [loading,setloading]=useState(false)
-
-  // Use effect with timer to display each and every word in the buttonText
-  useEffect(()=>{
-    // Timer
-    const interval = setInterval(()=>{ 
-      setCurrentTextIndex((prevIndex)=>
-      prevIndex === buttonText.length - 1 ? 0 : prevIndex + 1
-      );
-    },2000);
-    // Unmount and clear the timer
-    return()=>clearInterval(interval)
-  },[])
-
-//  Navigation function with loader
-  // const handleNavigation = ()=>{
-  //   setloading(true);
-
-  //   setTimeout(()=>{
-  //     router.replace("./record");
-  //     setloading(false)
-  //   }, 1000)
-  // }
+export default function RegisterScreen() {
 
   return (
-   <>
-   {/* <Stack>
-    <Stack.Screen name="./record.jsx"/>
-   </Stack> */}
-   
+   <> 
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
             <View style={styles.container}>
@@ -98,17 +68,14 @@ export default function LoginScreen() {
                     style={styles.passwordInput}
                     ></TextInput>
                     
-                    {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>}
+                    {/* {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>} */}
               </View>
              </ScrollView>
               <View style={styles.logincontainer}>
                 <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
-                {/* <Link href="#">Forgot Password?</Link> */}
                   <Text>Beta Version 1.0</Text>
-              </View>
-                       
-            </View>
-          
+              </View>            
+            </View>         
    </SafeAreaView>
    </>
   );
