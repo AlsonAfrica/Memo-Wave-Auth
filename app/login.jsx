@@ -2,8 +2,10 @@ import { StatusBar } from "expo-status-bar";
 import { Image, SafeAreaView } from "react-native";
 import { StyleSheet,View,Text,Pressable,ActivityIndicator } from "react-native";
 import { useState,useEffect } from "react";
-import { Link, router } from "expo-router";
-import {Stack} from "expo-router"
+import { router } from "expo-router";
+import {Stack} from "expo-router";
+import { Link } from "expo-router";
+import { TextInput } from "react-native-web";
 
 
 // array that holds 2 strings rendered in the button
@@ -15,7 +17,7 @@ const buttonText = [
 
 
 
-export default function LandingScreen() {
+export default function LoginScreen() {
   // state to keep track of the buttonText index
   const [currentTextIndex,setCurrentTextIndex] = useState(0);
   // initial state of the loader
@@ -45,10 +47,9 @@ export default function LandingScreen() {
 
   return (
    <>
-   <Stack>
-    <Stack.Screen name="./login"/>
-    <Stack.Screen name="./register"/>
-   </Stack>
+   {/* <Stack>
+    <Stack.Screen name="./record.jsx"/>
+   </Stack> */}
    
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
@@ -68,23 +69,27 @@ export default function LandingScreen() {
             </View>  
             <View style={styles.authcontainer}>
               <View style={styles.logocontainer}>
-                <Image
-                resizeMode="contain"
-                style={{height:150,width:150}}
-                source={require("../assets/microphone.png")}
-                />
+               <Text style={{fontSize:50, fontWeight:"bold"}}>Login</Text>
               </View>
               <View style={styles.adtextcontainer}>
                 <Text style={{textAlign:"center"}}>{buttonText[currentTextIndex]}</Text>
               </View>
               <View style={styles.buttonscontainer}>
-                  <Pressable>
-                    <Link style={styles.signupbutton} href="./login">Sign Up</Link>
-                  </Pressable>
-                  <Pressable>
-                    <Link style={styles.loginbutton} href="./register">Login</Link>
-                  </Pressable>
+                  <TextInput 
+                  placeholder="Email"
+                  style={styles.emailInput}
+                  ></TextInput>
+                  <TextInput
+                  placeholder="Password"
+                  style={styles.passwordInput}
+                  ></TextInput>
+                  
                   {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>}
+              </View>
+              <View style={styles.logincontainer}>
+                <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
+                <Link href="#">Forgot Password?</Link>
+                  <Text>Beta Version 1.0</Text>
               </View>
                        
             </View>
@@ -128,7 +133,7 @@ const styles = StyleSheet.create({
     color:"white"
   },
   authcontainer:{
-    height:"60%",
+    height:"65%",
     width:"100%",
     backgroundColor:"white",
     borderTopLeftRadius:25,
@@ -136,7 +141,10 @@ const styles = StyleSheet.create({
   },
   logocontainer:{
     alignItems:"center",
-    justifyContent:"center"
+    justifyContent:"center",
+    marginTop:20,
+    marginBottom:20
+
   },
   adtextcontainer:{
     display:"flex",
@@ -151,14 +159,16 @@ const styles = StyleSheet.create({
       flexDirection:"column",
       gap:20
   },
-  signupbutton:{
+  emailInput:{
     width:250,
     height:50,
-    backgroundColor:"black",
-    color:"white",
+    backgroundColor:"white",
+    color:"grey",
     textAlign:"center",
     padding:15,
     borderRadius:25,
+    borderWidth:2,
+    borderColor:"#5AB8A6",
          // Shadow for iOS
          shadowColor: '#000',
          shadowOffset: { width: 0, height: 4 },
@@ -168,11 +178,36 @@ const styles = StyleSheet.create({
          // Shadow for Android
          elevation: 10, 
   },
-  loginbutton:{
+  passwordInput:{
     width:250,
     height:50,
     backgroundColor:"white",
-    color:"black",
+    color:"grey",
+    textAlign:"center",
+    padding:15,
+    borderRadius:25,
+    borderWidth:2,
+    borderColor:"#5AB8A6",
+         // Shadow for iOS
+         shadowColor: '#000',
+         shadowOffset: { width: 0, height: 4 },
+         shadowOpacity: 0.3,
+         shadowRadius: 6,
+     
+         // Shadow for Android
+         elevation: 10, 
+  },
+  logincontainer:{
+      justifyContent:"center",
+      alignItems:"center",
+      marginTop:15,
+      gap:10
+  },
+  loginbutton:{
+    width:250,
+    height:50,
+    backgroundColor:"black",
+    color:"white",
     textAlign:"center",
     padding:15,
     borderWidth:2,
@@ -186,5 +221,6 @@ const styles = StyleSheet.create({
          // Shadow for Android
          elevation: 10, 
   }
+
 
 })
