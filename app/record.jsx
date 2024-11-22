@@ -146,6 +146,7 @@ const filteredRecordings = recordings.filter((recording) =>
           text2: 'Sharing is not supported on this device.',
           position: 'top',
         });
+        
         return;
       }
   
@@ -159,6 +160,7 @@ const filteredRecordings = recordings.filter((recording) =>
         });
         return;
       }
+      
   
       // Check file exists and is readable
       const fileInfo = await FileSystem.getInfoAsync(recordingLine.uri);

@@ -75,7 +75,7 @@ export default function LandingScreen() {
                     <Text style={styles.signupbutton}>Sign in</Text>
                   </Pressable>
                   <Pressable onPress={()=>handleRegister()}>
-                    <Text style={styles.loginbutton}>Login</Text>
+                    <Text style={styles.loginbutton}>Sign Up</Text>
                   </Pressable>
               </View>
                        

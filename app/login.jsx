@@ -4,11 +4,11 @@ import { SafeAreaView } from "react-native";
 import { StyleSheet,View,Text,Pressable,ActivityIndicator } from "react-native";
 import { useState,useEffect } from "react";
 import { router } from "expo-router";
-import {Stack} from "expo-router";
 import { Link } from "expo-router";
 import { useNavigation } from "expo-router";
 import { TextInput } from "react-native";
-
+import { auth } from "../Config/firebase";
+import {createUserWithEmailAndPassword} from "firebase/auth"
 
 // array that holds 2 strings rendered in the button
 const buttonText = [
@@ -20,11 +20,13 @@ const buttonText = [
 
 
 export default function LoginScreen() {
+  const [email,setEmail] = useState('');
+  const [password,setPassword] = useState('');
+  const [error,setError] = useState('')
   // state to keep track of the buttonText index
   const [currentTextIndex,setCurrentTextIndex] = useState(0);
   const navigation = useNavigation()
-  // initial state of the loader
-  // const [loading,setloading]=useState(false)
+ 
 
   // Use effect with timer to display each and every word in the buttonText
   useEffect(()=>{
@@ -38,25 +40,23 @@ export default function LoginScreen() {
     return()=>clearInterval(interval)
   },[])
 
+  
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/record");
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+  
+
   const handleGoBack = ()=>{
     navigation.goBack();
   }
-//  Navigation function with loader
-  // const handleNavigation = ()=>{
-  //   setloading(true);
-
-  //   setTimeout(()=>{
-  //     router.replace("./record");
-  //     setloading(false)
-  //   }, 1000)
-  // }
 
   return (
    <>
-   {/* <Stack>
-    <Stack.Screen name="./record.jsx"/>
-   </Stack> */}
-   
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
             <View style={styles.container}>
@@ -67,11 +67,6 @@ export default function LoginScreen() {
               />
                <Text style={styles.logoText}>Memo-Wave</Text>
                <Text>"Capture-Share-Remember"</Text>
-                {/* <Pressable style={styles.button} onPress={handleNavigation}>
-                  <Text style={styles.buttontext}>{buttonText[currentTextIndex]}</Text>
-                </Pressable> */}
-               {/* Show the loader when state is true */}
-                
             </View>  
             <View style={styles.authcontainer}>
               <View style={styles.logocontainer}>
@@ -80,20 +75,27 @@ export default function LoginScreen() {
               <View style={styles.adtextcontainer}>
                 <Text style={{textAlign:"center"}}>{buttonText[currentTextIndex]}</Text>
               </View>
+
               <View style={styles.buttonscontainer}>
                   <TextInput 
                   placeholder="Email"
                   style={styles.emailInput}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
                   ></TextInput>
                   <TextInput
                   placeholder="Password"
                   style={styles.passwordInput}
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
                   ></TextInput>
-                  
-                  {/* {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>} */}
               </View>
+
               <View style={styles.logincontainer}>
-                <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
+              {error && <Text style={{ color: "red" }}>{error}</Text>}
+                <Pressable onPress={()=>handleLogin()}><Text style={styles.loginbutton}>Login</Text></Pressable>
                 <Link href="#">Forgot Password?</Link>
                   <Text>Beta Version 1.0</Text>
               </View>
@@ -104,6 +106,7 @@ export default function LoginScreen() {
    </>
   );
 }
+
 
 // Styles 
 const styles = StyleSheet.create({

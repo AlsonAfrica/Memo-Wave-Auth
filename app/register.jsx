@@ -7,22 +7,70 @@ import {Stack} from "expo-router";
 import { Link } from "expo-router";
 import { ScrollView } from "react-native";
 import { TextInput } from "react-native";
+import { auth } from "../Config/firebase";
+import Toast from 'react-native-toast-message';
+import {createUserWithEmailAndPassword} from "firebase/auth"
+
 
 // array that holds 2 strings rendered in the button
-const buttonText = [
-  "Record, relive, and share",
-  "keep your recordings safe, accessible offline,\n and backed up in the cloud.",
-  "Your voice, your memories, your way."
-]
-
-
-
 export default function RegisterScreen() {
+  
+  
+  const [fullName,setfullName] = useState('');
+  const [email,setEmail] = useState('');
+  const [phoneNumber,setphoneNumber] = useState('');
+  const [password,setPassword] = useState('');
+  const [confirmPassword,setconfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error,setError] = useState("")
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: "Passwords do not match",
+      });
+      return;
+    }
+  
+    setLoading(true); // Show loader
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Success toast
+      Toast.show({
+        type: "success",
+        text1: "Registration Successful",
+        text2: "You can now log in",
+      });
+  
+      // Navigate to login screen
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000); // Delay navigation to allow the success toast to be visible
+    } catch (error) {
+      // Error toast
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: error.message,
+      });
+    } finally {
+      // Ensure the loader remains visible for at least 2 seconds
+      setTimeout(() => {
+        setLoading(false); // Hide loader after delay
+      }, 2000);
+    }
+  };
+  
 
   return (
    <> 
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
+        <Toast/>
             <View style={styles.container}>
               <Image
               resizeMode="contain"
@@ -31,11 +79,6 @@ export default function RegisterScreen() {
               />
                <Text style={styles.logoText}>Memo-Wave</Text>
                <Text>"Capture-Share-Remember"</Text>
-                {/* <Pressable style={styles.button} onPress={handleNavigation}>
-                  <Text style={styles.buttontext}>{buttonText[currentTextIndex]}</Text>
-                </Pressable> */}
-               {/* Show the loader when state is true */}
-                
             </View>  
             <View style={styles.authcontainer}>
               <View style={styles.logocontainer}>
@@ -43,36 +86,50 @@ export default function RegisterScreen() {
               </View>
              <ScrollView>
                 <View style={styles.buttonscontainer}>
+                  <View style={{flex:1}}>
+                     {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>}
+                  </View>
                     <TextInput 
                     placeholder="Full Name"
                     style={styles.emailInput}
+                    value={fullName}
+                    onChangeText={setfullName}
                     ></TextInput>
 
                     <TextInput
                     placeholder="Phone Number"
                     style={styles.passwordInput}
+                    value={phoneNumber}
+                    onChangeText={setphoneNumber}
                     ></TextInput>
 
                     <TextInput
                     placeholder="E-mail"
                     style={styles.passwordInput}
+                    value={email}
+                    onChangeText={setEmail}
                     ></TextInput>
 
                     <TextInput
                     placeholder="Password"
                     style={styles.passwordInput}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
                     ></TextInput>
 
                      <TextInput
                     placeholder=" Confirm Password"
                     style={styles.passwordInput}
+                    value={confirmPassword}
+                    onChangeText={setconfirmPassword}
+                    secureTextEntry
                     ></TextInput>
-                    
-                    {/* {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>} */}
               </View>
              </ScrollView>
               <View style={styles.logincontainer}>
-                <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
+                 {error && <Text style={{color:"red", fontWeight:"bold"}}>Passwords Do Not Match</Text>}
+                <Pressable onPress={()=>handleRegister()}><Text style={styles.loginbutton}>Register</Text></Pressable>
                   <Text>Beta Version 1.0</Text>
               </View>            
             </View>         
@@ -203,6 +260,9 @@ const styles = StyleSheet.create({
      
          // Shadow for Android
          elevation: 10, 
+  },
+  loader:{
+    
   }
 
 
