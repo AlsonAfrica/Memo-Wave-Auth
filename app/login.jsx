@@ -8,7 +8,8 @@ import { Link } from "expo-router";
 import { useNavigation } from "expo-router";
 import { TextInput } from "react-native";
 import { auth } from "../Config/firebase";
-import {createUserWithEmailAndPassword} from "firebase/auth"
+import {signInWithEmailAndPassword} from "firebase/auth"
+import Toast from "react-native-toast-message";
 
 // array that holds 2 strings rendered in the button
 const buttonText = [
@@ -44,8 +45,29 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/record");
+  
+      // Show success toast
+      Toast.show({
+        type: "success",
+        text1: "Login Successful",
+        text2: "Welcome back!",
+      });
+  
+      setEmail("");
+      setPassword("");
+  
+      // Delay navigation by 2 seconds
+      setTimeout(() => {
+        router.push("/record");
+      }, 3000); // 2000ms = 2 seconds
     } catch (error) {
+      // Show error toast
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2: error.message,
+      });
+  
       setError(error.message);
     }
   };
@@ -59,6 +81,7 @@ export default function LoginScreen() {
    <>
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
+           <Toast/>
             <View style={styles.container}>
               <Image
               resizeMode="contain"
