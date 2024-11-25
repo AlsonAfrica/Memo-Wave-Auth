@@ -67,11 +67,9 @@ export default function LoginScreen() {
               />
                <Text style={styles.logoText}>Memo-Wave</Text>
                <Text>"Capture-Share-Remember"</Text>
-                {/* <Pressable style={styles.button} onPress={handleNavigation}>
-                  <Text style={styles.buttontext}>{buttonText[currentTextIndex]}</Text>
-                </Pressable> */}
-               {/* Show the loader when state is true */}
-                
+               {/* <View>
+                <Pressable onPress={()=>handleGoBack()}><Text>Go back</Text></Pressable>
+               </View> */}
             </View>  
             <View style={styles.authcontainer}>
               <View style={styles.logocontainer}>

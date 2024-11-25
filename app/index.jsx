@@ -34,7 +34,7 @@ export default function LandingScreen() {
 
 
   const handleLogin = ()=>{
-      router.replace("./login");
+      router.replace("./record");
   }
   const handleRegister = ()=>{
     router.replace("./register")

@@ -15,6 +15,7 @@ export default function Layout() {
         name="index"
         options={{
           headerShown: false,
+          
         }}
       />
       
@@ -45,7 +46,7 @@ export default function Layout() {
         name="record"
         options={{
           title: 'Record Audio',
-          headerShown: true,
+          headerShown: false,
           gestureEnabled: true,
         }}
       />
