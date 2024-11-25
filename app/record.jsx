@@ -13,7 +13,6 @@ import { Audio } from "expo-av";
 import { useEffect } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator } from "react-native-web";
 import { router } from "expo-router";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -23,8 +22,7 @@ import { TextInput } from "react-native";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import Feather from "@expo/vector-icons/Feather";
-import { Link } from "expo-router";
-import { Switch } from "react-native";
+import Profile from "./profile";
 
 // import * as Progress from 'react-native-progress';
 
@@ -385,75 +383,8 @@ export default function RecordingScreen() {
         </View>
       </SafeAreaView>
     ):
-    
     (
-      <SafeAreaView style={styles.safeAreaView}>
-      <StatusBar style="Dark" />
-      <ScrollView style={styles.Profilecontainer}>
-        <View>
-
-          <Toast />
-
-          <View style={styles.topcontainer}>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 20,
-                fontWeight: "bold",
-                marginTop: 20,
-              }}
-            >
-              Profile
-            </Text>
-            <Pressable style={styles.settingsbutton} onPress={toggleSettings}>
-            <Feather name="mic" size={24} color="black" />
-            </Pressable>
-          </View>
-          <View style={styles.personalDataContainer}>
-          <TextInput 
-                  placeholder="Name"
-                  style={styles.nameinput}
-                  ></TextInput>
-
-                  <TextInput
-                  placeholder="Phonenumber"
-                  style={styles.phonenumberinput}
-                  ></TextInput>
-
-                   <TextInput
-                  placeholder="Password"
-                  style={styles.passwordinput}
-                  ></TextInput>
-                  </View>
-                    <View style={styles.togglescontainer}>
-                      <View style={styles.notificationtoggle}>
-                        <Text>Notifications</Text>
-                        <Switch/>
-                      </View>
-                      <View style={styles.darkmodetoggle}>
-                        <Text>Dark-Mode</Text>
-                        <Switch/>
-                      </View>
-                      <View style={styles.datatoggle}>
-                          <Text>Data-Sync</Text>
-                        <Switch/>
-                       </View>
-                   </View>
-                   <View style={styles.feedbackcontainer}>
-                    <Text>Feedback</Text>
-                    <TextInput 
-                    style={styles.feedbackinput}
-                    placeholder="Write your feedback here..."
-                    multiline={true} // Allows multiple lines
-                    numberOfLines={4} // Initial height (number of visible lines)
-                    maxLength={250} // Optional: Limit the characters
-                    />
-                   </View>
-          {loading && <ActivityIndicator size="large" color="#5AB8A6" />}
-        </View>
-      </ScrollView>
-      {/* Control buttons */}
-    </SafeAreaView>
+      <Profile toggleSettings={toggleSettings}/>
     )}
     </>
   );
@@ -564,151 +495,5 @@ const styles = StyleSheet.create({
   settingsbutton: {
     marginTop: 20,
   },
-
-
-  // Second Container
- Profilecontainer:{
-  // flex: 1,
-  marginTop: 20,
-  marginBottom: 20,
-  borderRadius: 20,
-  width: "95%",
-  backgroundColor: "white",
-  paddingHorizontal: 20,
-
-  // Shadow for iOS
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.3,
-  shadowRadius: 6,
-
-  // Shadow for Android
-  elevation: 10,
-  },
-
-  personalDataContainer:{
-     marginTop:50,
-     Display:"flex",
-     flexDirection:"column",
-     justifyContent:"center",
-     alignItems:"center",
-     gap:20
-  },
-
-  nameinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  phonenumberinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  passwordinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  togglescontainer:{
-    marginTop:50,
-    Display:"flex",
-    flexDirection:"column",
-    justifyContent:"center",
-    alignItems:"center",
-    gap:20
- },
- notificationtoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- darkmodetoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- datatoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- feedbackcontainer:{
-  marginTop:50,
-  Display:"flex",
-  flexDirection:"column",
-  justifyContent:"center",
-  alignItems:"center",
-  gap:20
- },
- feedbackinput:{
-  width:300,
-  height:200,
-  backgroundColor:"white",
-  color:"grey",
-  textAlign:"center",
-  padding:15,
-  borderRadius:25,
-  borderWidth:2,
-  borderColor:"#5AB8A6",
-       // Shadow for iOS
-       shadowColor: '#000',
-       shadowOffset: { width: 0, height: 4 },
-       shadowOpacity: 0.3,
-       shadowRadius: 6,
-   
-       // Shadow for Android
-       elevation: 10, 
- }
-
-
 
 });
