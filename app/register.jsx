@@ -7,18 +7,12 @@ import {Stack} from "expo-router";
 import { Link } from "expo-router";
 import { ScrollView } from "react-native";
 import { TextInput } from "react-native";
-
-// array that holds 2 strings rendered in the button
-const buttonText = [
-  "Record, relive, and share",
-  "keep your recordings safe, accessible offline,\n and backed up in the cloud.",
-  "Your voice, your memories, your way."
-]
+import { useRouter } from 'expo-router';
 
 
-
+// Rendering the register component
 export default function RegisterScreen() {
-
+  const router = useRouter();
   return (
    <> 
    <SafeAreaView style={styles.safeareaview}>
@@ -31,10 +25,6 @@ export default function RegisterScreen() {
               />
                <Text style={styles.logoText}>Memo-Wave</Text>
                <Text>"Capture-Share-Remember"</Text>
-                {/* <Pressable style={styles.button} onPress={handleNavigation}>
-                  <Text style={styles.buttontext}>{buttonText[currentTextIndex]}</Text>
-                </Pressable> */}
-               {/* Show the loader when state is true */}
                 
             </View>  
             <View style={styles.authcontainer}>
@@ -72,7 +62,7 @@ export default function RegisterScreen() {
               </View>
              </ScrollView>
               <View style={styles.logincontainer}>
-                <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
+                <Pressable onPress={()=>router.push('/login')}><Text style={styles.loginbutton}>Register</Text></Pressable>
                   <Text>Beta Version 1.0</Text>
               </View>            
             </View>         

@@ -41,22 +41,10 @@ export default function LoginScreen() {
   const handleGoBack = ()=>{
     navigation.goBack();
   }
-//  Navigation function with loader
-  // const handleNavigation = ()=>{
-  //   setloading(true);
 
-  //   setTimeout(()=>{
-  //     router.replace("./record");
-  //     setloading(false)
-  //   }, 1000)
-  // }
 
   return (
    <>
-   {/* <Stack>
-    <Stack.Screen name="./record.jsx"/>
-   </Stack> */}
-   
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
             <View style={styles.container}>

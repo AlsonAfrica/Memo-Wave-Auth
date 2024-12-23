@@ -25,6 +25,7 @@ import * as FileSystem from "expo-file-system";
 import Feather from "@expo/vector-icons/Feather";
 import { Link } from "expo-router";
 import { Switch } from "react-native";
+import ProfilePage from "./profile";
 
 // import * as Progress from 'react-native-progress';
 
@@ -384,75 +385,14 @@ export default function RecordingScreen() {
         </View>
       </SafeAreaView>
     ):
-    
+
+    // Profile page conditionally rendered
     (
-      <SafeAreaView style={styles.safeAreaView}>
-      <StatusBar style="Dark" />
-      <ScrollView style={styles.Profilecontainer}>
-        <View>
-
-          <Toast />
-
-          <View style={styles.topcontainer}>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 20,
-                fontWeight: "bold",
-                marginTop: 20,
-              }}
-            >
-              Profile
-            </Text>
-            <Pressable style={styles.settingsbutton} onPress={toggleSettings}>
-            <Feather name="mic" size={24} color="black" />
-            </Pressable>
-          </View>
-          <View style={styles.personalDataContainer}>
-          <TextInput 
-                  placeholder="Name"
-                  style={styles.nameinput}
-                  ></TextInput>
-
-                  <TextInput
-                  placeholder="Phonenumber"
-                  style={styles.phonenumberinput}
-                  ></TextInput>
-
-                   <TextInput
-                  placeholder="Password"
-                  style={styles.passwordinput}
-                  ></TextInput>
-                  </View>
-                    <View style={styles.togglescontainer}>
-                      <View style={styles.notificationtoggle}>
-                        <Text>Notifications</Text>
-                        <Switch/>
-                      </View>
-                      <View style={styles.darkmodetoggle}>
-                        <Text>Dark-Mode</Text>
-                        <Switch/>
-                      </View>
-                      <View style={styles.datatoggle}>
-                          <Text>Data-Sync</Text>
-                        <Switch/>
-                       </View>
-                   </View>
-                   <View style={styles.feedbackcontainer}>
-                    <Text>Feedback</Text>
-                    <TextInput 
-                    style={styles.feedbackinput}
-                    placeholder="Write your feedback here..."
-                    multiline={true} // Allows multiple lines
-                    numberOfLines={4} // Initial height (number of visible lines)
-                    maxLength={250} // Optional: Limit the characters
-                    />
-                   </View>
-          {loading && <ActivityIndicator size="large" color="#5AB8A6" />}
-        </View>
-      </ScrollView>
-      {/* Control buttons */}
-    </SafeAreaView>
+      <ProfilePage
+      settings={settings}
+      setSettings={setSettings}
+      toggleSettings={toggleSettings}
+      />
     )}
     </>
   );
