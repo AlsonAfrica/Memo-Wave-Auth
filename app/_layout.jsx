@@ -40,6 +40,16 @@ export default function Layout() {
           animation: 'slide_from_right',
         }}
       />
+
+      <Stack.Screen
+        name="profile"
+        options={{
+          headerShown: false,
+          presentation: 'card',  // Changed from 'modal' to 'card'
+          gestureEnabled: true,
+          animation: 'slide_from_right',
+        }}
+      />
       
       {/* Record page route */}
       <Stack.Screen

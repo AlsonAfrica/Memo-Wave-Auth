@@ -13,7 +13,6 @@ import { Audio } from "expo-av";
 import { useEffect } from "react";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator } from "react-native-web";
 import { router } from "expo-router";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -161,6 +160,7 @@ export default function RecordingScreen() {
           text2: "Sharing is not supported on this device.",
           position: "top",
         });
+        
         return;
       }
       // Ensure we have a valid URI
@@ -503,151 +503,5 @@ const styles = StyleSheet.create({
   settingsbutton: {
     marginTop: 20,
   },
-
-
-  // Second Container
- Profilecontainer:{
-  // flex: 1,
-  marginTop: 20,
-  marginBottom: 20,
-  borderRadius: 20,
-  width: "95%",
-  backgroundColor: "white",
-  paddingHorizontal: 20,
-
-  // Shadow for iOS
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.3,
-  shadowRadius: 6,
-
-  // Shadow for Android
-  elevation: 10,
-  },
-
-  personalDataContainer:{
-     marginTop:50,
-     Display:"flex",
-     flexDirection:"column",
-     justifyContent:"center",
-     alignItems:"center",
-     gap:20
-  },
-
-  nameinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  phonenumberinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  passwordinput:{
-    width:250,
-    height:50,
-    backgroundColor:"white",
-    color:"grey",
-    textAlign:"center",
-    padding:15,
-    borderRadius:25,
-    borderWidth:2,
-    borderColor:"#5AB8A6",
-         // Shadow for iOS
-         shadowColor: '#000',
-         shadowOffset: { width: 0, height: 4 },
-         shadowOpacity: 0.3,
-         shadowRadius: 6,
-     
-         // Shadow for Android
-         elevation: 10, 
-  },
-  togglescontainer:{
-    marginTop:50,
-    Display:"flex",
-    flexDirection:"column",
-    justifyContent:"center",
-    alignItems:"center",
-    gap:20
- },
- notificationtoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- darkmodetoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- datatoggle:{
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap:170,
-  width:"100%"
- },
- feedbackcontainer:{
-  marginTop:50,
-  Display:"flex",
-  flexDirection:"column",
-  justifyContent:"center",
-  alignItems:"center",
-  gap:20
- },
- feedbackinput:{
-  width:300,
-  height:200,
-  backgroundColor:"white",
-  color:"grey",
-  textAlign:"center",
-  padding:15,
-  borderRadius:25,
-  borderWidth:2,
-  borderColor:"#5AB8A6",
-       // Shadow for iOS
-       shadowColor: '#000',
-       shadowOffset: { width: 0, height: 4 },
-       shadowOpacity: 0.3,
-       shadowRadius: 6,
-   
-       // Shadow for Android
-       elevation: 10, 
- }
-
-
 
 });

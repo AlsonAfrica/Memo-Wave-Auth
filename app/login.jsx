@@ -4,11 +4,12 @@ import { SafeAreaView } from "react-native";
 import { StyleSheet,View,Text,Pressable,ActivityIndicator } from "react-native";
 import { useState,useEffect } from "react";
 import { router } from "expo-router";
-import {Stack} from "expo-router";
 import { Link } from "expo-router";
 import { useNavigation } from "expo-router";
 import { TextInput } from "react-native";
-
+import { auth } from "../Config/firebase";
+import {signInWithEmailAndPassword} from "firebase/auth"
+import Toast from "react-native-toast-message";
 
 // array that holds 2 strings rendered in the button
 const buttonText = [
@@ -20,11 +21,13 @@ const buttonText = [
 
 
 export default function LoginScreen() {
+  const [email,setEmail] = useState('');
+  const [password,setPassword] = useState('');
+  const [error,setError] = useState('')
   // state to keep track of the buttonText index
   const [currentTextIndex,setCurrentTextIndex] = useState(0);
   const navigation = useNavigation()
-  // initial state of the loader
-  // const [loading,setloading]=useState(false)
+ 
 
   // Use effect with timer to display each and every word in the buttonText
   useEffect(()=>{
@@ -38,15 +41,47 @@ export default function LoginScreen() {
     return()=>clearInterval(interval)
   },[])
 
+  
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+  
+      // Show success toast
+      Toast.show({
+        type: "success",
+        text1: "Login Successful",
+        text2: "Welcome back!",
+      });
+  
+      setEmail("");
+      setPassword("");
+  
+      // Delay navigation by 2 seconds
+      setTimeout(() => {
+        router.push("/record");
+      }, 3000); // 2000ms = 2 seconds
+    } catch (error) {
+      // Show error toast
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2: error.message,
+      });
+  
+      setError(error.message);
+    }
+  };
+  
+
   const handleGoBack = ()=>{
     navigation.goBack();
   }
-
 
   return (
    <>
    <SafeAreaView style={styles.safeareaview}>
         <StatusBar style="Dark"/>
+           <Toast/>
             <View style={styles.container}>
               <Image
               resizeMode="contain"
@@ -55,9 +90,6 @@ export default function LoginScreen() {
               />
                <Text style={styles.logoText}>Memo-Wave</Text>
                <Text>"Capture-Share-Remember"</Text>
-               {/* <View>
-                <Pressable onPress={()=>handleGoBack()}><Text>Go back</Text></Pressable>
-               </View> */}
             </View>  
             <View style={styles.authcontainer}>
               <View style={styles.logocontainer}>
@@ -66,20 +98,27 @@ export default function LoginScreen() {
               <View style={styles.adtextcontainer}>
                 <Text style={{textAlign:"center"}}>{buttonText[currentTextIndex]}</Text>
               </View>
+
               <View style={styles.buttonscontainer}>
                   <TextInput 
                   placeholder="Email"
                   style={styles.emailInput}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
                   ></TextInput>
                   <TextInput
                   placeholder="Password"
                   style={styles.passwordInput}
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
                   ></TextInput>
-                  
-                  {/* {loading && <ActivityIndicator size="large" color="white" marginTop="10"/>} */}
               </View>
+
               <View style={styles.logincontainer}>
-                <Pressable><Text style={styles.loginbutton}>Login</Text></Pressable>
+              {error && <Text style={{ color: "red" }}>{error}</Text>}
+                <Pressable onPress={()=>handleLogin()}><Text style={styles.loginbutton}>Login</Text></Pressable>
                 <Link href="#">Forgot Password?</Link>
                   <Text>Beta Version 1.0</Text>
               </View>
@@ -90,6 +129,7 @@ export default function LoginScreen() {
    </>
   );
 }
+
 
 // Styles 
 const styles = StyleSheet.create({
