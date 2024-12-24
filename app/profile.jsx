@@ -20,55 +20,28 @@ import { doc, getDoc } from "firebase/firestore";
 
 
 
-const ProfilePage = ({setting, setSettings,toggleSettings}) => {
+const ProfilePage = ({setting, setSettings,toggleSettings,userDetails,updateUserDetails,setUserDetails}) => {
   
   // States
-  const [loading, setLoading] = useState(false);
+  const [loading, setloading] = useState(false);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [isDarkModeEnabled, setIsDarkModeEnabled] = useState(false);
   const [isDataSyncEnabled, setIsDataSyncEnabled] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
+  const [feedback, setFeedback] = useState('');
+  
+  
 
   
   // Functions
-    useEffect(() => {
-      const fetchUserDetails = async () => {
-        try {
-          // Get the current user
-          const currentUser = auth.currentUser;
-  
-          if (currentUser) {
-            // Reference the user document in Firestore
-            const userDocRef = doc(db, "users", currentUser.uid);
-  
-            // Fetch the user document
-            const userDoc = await getDoc(userDocRef);
-  
-            if (userDoc.exists()) {
-              // Set user details to state
-              setUserDetails(userDoc.data());
-              console.log(userDetails.email)
-            } else {
-              console.error("No such user document found!");
-            }
-          } else {
-            console.error("No user is logged in.");
-          }
-        } catch (error) {
-          console.error("Error fetching user details:", error.message);
-        } finally {
-          setLoading(false); // Hide the loader
-        }
-      };
-  
-      fetchUserDetails();
-    }, []);
-  
-    if (loading) {
-      return <ActivityIndicator size="large" color="#0000ff" />;
-    }
+  const handleSave = () => {
+    updateUserDetails(userDetails); // Call the function passed as a prop
+  };
 
-
+  const handleSubmit = () => {
+    // Handle the submission logic here
+    console.log('Feedback submitted:', feedback);
+    setFeedback(''); // Clear the input after submission
+  };
 
   // UI button toggles
   const toggleNotifications = () => setIsNotificationsEnabled(prev => !prev);
@@ -119,7 +92,8 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
               placeholder="Full Name"
               style={styles.input}
               placeholderTextColor="#999"
-              value={userDetails.email}
+              value={userDetails.email || ""}
+              onChangeText={(text) => setUserDetails({ ...userDetails, email: text })}
             />
           </View>
 
@@ -130,8 +104,14 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
               style={styles.input}
               placeholderTextColor="#999"
               keyboardType="phone-pad"
-              value={userDetails.phoneNumber}
+              value={userDetails.phoneNumber || ""}
+              onChangeText={(text) => setUserDetails({ ...userDetails, phoneNumber: text })}
             />
+          </View>
+          <View>
+            <Pressable onPress={handleSave} >
+              <Text>Save</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -142,19 +122,32 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
           {renderSettingRow('Data Sync', isDataSyncEnabled, toggleDataSync, 'refresh-cw')}
         </View>
 
-        <View style={styles.feedbackContainer}>
-          <Text style={styles.sectionTitle}>Feedback</Text>
-          <View style={styles.feedbackInputWrapper}>
-            <TextInput
-              style={styles.feedbackInput}
-              placeholder="Write your feedback here..."
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={4}
-              maxLength={250}
-            />
-          </View>
+        <View style={styles.containerForm}>
+      <Text style={styles.mainTitle}>Share Your Thoughts</Text>
+      
+      <View style={styles.feedbackContainer}>
+        <Text style={styles.sectionTitle}>Feedback</Text>
+        <View style={styles.feedbackInputWrapper}>
+          <TextInput
+            style={styles.feedbackInput}
+            placeholder="Write your feedback here..."
+            placeholderTextColor="#999"
+            multiline
+            numberOfLines={4}
+            maxLength={250}
+            value={feedback}
+            onChangeText={setFeedback}
+          />
         </View>
+        
+        <Pressable
+          style={styles.sendButton}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.sendButtonText}>Send Feedback</Text>
+        </Pressable>
+      </View>
+    </View>
 
         {loading && (
           <View style={styles.loadingContainer}>
@@ -306,6 +299,61 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  },
+
+
+  containerForm: {
+    padding: 16,
+  },
+  mainTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  feedbackContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  feedbackInputWrapper: {
+    marginBottom: 16,
+  },
+  feedbackInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#f9f9f9',
+    minHeight: 100,
+  },
+  sendButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 6,
+    padding: 14,
+    alignItems: 'center',
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

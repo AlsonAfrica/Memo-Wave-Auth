@@ -25,27 +25,91 @@ import Feather from "@expo/vector-icons/Feather";
 import { Link } from "expo-router";
 import { Switch } from "react-native";
 import ProfilePage from "./profile";
+import { auth } from '../Config/firebase';
+import { db } from '../Config/firebase';
+import { doc, getDoc,updateDoc } from "firebase/firestore";
 
-// import * as Progress from 'react-native-progress';
 
 export default function RecordingScreen() {
+
+  // STATES
   const [recording, setRecording] = useState(null);
   const [recordings, setRecordings] = useState([]);
   const [loading, setloading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [settings, setSettings] = useState("recording-screen");
+  const [userDetails, setUserDetails] = useState({ email: "", phoneNumber: "" });
 
-  //  Destructure Date.now() to receive date and time
+  
+  // FUNCTIONS
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        // Get the current user
+        const currentUser = auth.currentUser;
+
+        if (currentUser) {
+          // Reference the user document in Firestore
+          const userDocRef = doc(db, "users", currentUser.uid);
+
+          // Fetch the user document
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            // Set user details to state
+            setUserDetails(userDoc.data());
+          
+          
+          } else {
+            console.error("No such user document found!");
+          }
+        } else {
+          console.error("No user is logged in.");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error.message);
+      } finally {
+        setloading(false); // Hide the loader
+      }
+    };
+
+
+    fetchUserDetails();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+  console.log("this data",userDetails)
+
+
+
+  // Update userDetails 
+  const updateUserDetails = async (updatedDetails) => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userDocRef, updatedDetails);
+        setUserDetails(updatedDetails); // Update state with new details
+        alert("Details updated successfully!");
+      } else {
+        alert("No user is logged in.");
+      }
+    } catch (error) {
+      console.error("Error updating user details:", error.message);
+      alert("Failed to update details.");
+    }
+  };
+
+
+
+  // Date and time formating
   const now = Date.now();
-
   const date = new Date(now);
-
-  // Extract the date components
   const day = date.getDate();
   const month = date.getMonth();
   const year = date.getFullYear();
-
-  // Extract the time components
   const hours = date.getHours();
   const minutes = date.getMinutes();
   const seconds = date.getSeconds();
@@ -54,10 +118,15 @@ export default function RecordingScreen() {
   const formattedDate = `${day}/${month}/${year}`;
   const formattedTime = `${hours}:${minutes}:${seconds}`;
 
+
+
+  // Filter Recordings Search
   const filteredRecordings = recordings.filter(
     (recording) =>
       (recording.title || "").toLowerCase().includes(searchQuery.toLowerCase()) // Ensure title exists before calling toLowerCase()
   );
+
+
 
   // Function to start recording audio
   async function startRecording() {
@@ -77,9 +146,7 @@ export default function RecordingScreen() {
       console.error("Error starting recording:", error);
     }
   }
-
   useEffect(() => {
-    // Load recordings from AsyncStorage on component mount
     const loadRecordings = async () => {
       try {
         const savedRecordings = await AsyncStorage.getItem("recordings");
@@ -104,6 +171,8 @@ export default function RecordingScreen() {
     }, 1000);
   };
 
+
+
   // Function to stop recording audio
   async function stopRecording() {
     try {
@@ -115,13 +184,11 @@ export default function RecordingScreen() {
       const { sound, status } = await Audio.Sound.createAsync({ uri });
 
       const newRecording = {
-        uri, // Save file URI
-        duration: getDurationFormatted(status.durationMillis), // Save formatted duration
+        uri, 
+        duration: getDurationFormatted(status.durationMillis), 
       };
-
       // Update state with new recording
       setRecordings((prevRecordings) => [...prevRecordings, newRecording]);
-
       // Save to AsyncStorage
       const savedRecordings = await AsyncStorage.getItem("recordings");
       const recordingsArray = savedRecordings
@@ -150,9 +217,10 @@ export default function RecordingScreen() {
     }
   }
 
+
+//  Share recording
   const shareRecording = async (recordingLine) => {
     try {
-      // Check if sharing is available
       if (!(await Sharing.isAvailableAsync())) {
         Toast.show({
           type: "error",
@@ -212,12 +280,16 @@ export default function RecordingScreen() {
     }
   };
 
+
+
   // Helper function to format recording duration
   function getDurationFormatted(milliseconds) {
     const minutes = Math.floor(milliseconds / 1000 / 60);
     const seconds = Math.floor((milliseconds / 1000) % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
+
+
 
   // Function to delete a recording by index
   const deleteRecording = async (index) => {
@@ -258,7 +330,7 @@ export default function RecordingScreen() {
         {
           text: "No",
           onPress: () => console.log("Deletion canceled"), // Log cancellation
-          style: "cancel", // Default cancel style
+          style: "cancel", 
         },
       ]
     );
@@ -267,6 +339,9 @@ export default function RecordingScreen() {
   const toggleSettings = () => {
     setSettings(settings === "recording-screen" ? "settings" : "recording-screen");
   };
+
+
+
 
   // Function to render each recording item
   function getRecordingLines() {
@@ -332,6 +407,10 @@ export default function RecordingScreen() {
     ));
   }
 
+
+
+
+
   // FRONT END LAYOUT
   return ( 
     <>
@@ -340,9 +419,7 @@ export default function RecordingScreen() {
         <StatusBar style="Dark" />
         <ScrollView style={styles.recordingListContainer}>
           <View>
-  
             <Toast />
-  
             <View style={styles.topcontainer}>
               <Text
                 style={{
@@ -392,12 +469,17 @@ export default function RecordingScreen() {
       settings={settings}
       setSettings={setSettings}
       toggleSettings={toggleSettings}
+      userDetails={userDetails}
+      updateUserDetails={updateUserDetails}
+      setUserDetails={setUserDetails}
       />
     )}
     </>
   );
 }
 // END FRONT END LAYOUT
+
+
 
 // Syles
 const styles = StyleSheet.create({
@@ -412,8 +494,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     bottom: 40,
-    width: 40, // specify your desired width
-    alignSelf: "center", // this will center the container itself
+    width: 40, 
+    alignSelf: "center",
   },
   button: {
     padding: 15,
@@ -505,3 +587,4 @@ const styles = StyleSheet.create({
   },
 
 });
+// End
