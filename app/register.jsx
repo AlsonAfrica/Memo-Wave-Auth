@@ -38,6 +38,7 @@ export default function RegisterScreen() {
       // Attempt to create a new user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      console.log(user.uid);
   
       // Save additional user details in Firestore
       await setDoc(doc(db, "users", user.uid), {

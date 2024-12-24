@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -14,17 +14,68 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { auth } from '../Config/firebase';
+import { db } from '../Config/firebase';
+import { doc, getDoc } from "firebase/firestore";
+
+
 
 const ProfilePage = ({setting, setSettings,toggleSettings}) => {
+  
+  // States
   const [loading, setLoading] = useState(false);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [isDarkModeEnabled, setIsDarkModeEnabled] = useState(false);
   const [isDataSyncEnabled, setIsDataSyncEnabled] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
 
+  
+  // Functions
+    useEffect(() => {
+      const fetchUserDetails = async () => {
+        try {
+          // Get the current user
+          const currentUser = auth.currentUser;
+  
+          if (currentUser) {
+            // Reference the user document in Firestore
+            const userDocRef = doc(db, "users", currentUser.uid);
+  
+            // Fetch the user document
+            const userDoc = await getDoc(userDocRef);
+  
+            if (userDoc.exists()) {
+              // Set user details to state
+              setUserDetails(userDoc.data());
+              console.log(userDetails.email)
+            } else {
+              console.error("No such user document found!");
+            }
+          } else {
+            console.error("No user is logged in.");
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error.message);
+        } finally {
+          setLoading(false); // Hide the loader
+        }
+      };
+  
+      fetchUserDetails();
+    }, []);
+  
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+
+
+  // UI button toggles
   const toggleNotifications = () => setIsNotificationsEnabled(prev => !prev);
   const toggleDarkMode = () => setIsDarkModeEnabled(prev => !prev);
   const toggleDataSync = () => setIsDataSyncEnabled(prev => !prev);
 
+  // Settings
   const renderSettingRow = (title, value, onToggle, icon) => (
     <View style={styles.settingRow}>
       <View style={styles.settingLeft}>
@@ -40,6 +91,7 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
     </View>
   );
 
+  // Beginning of UI element
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
@@ -67,6 +119,7 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
               placeholder="Full Name"
               style={styles.input}
               placeholderTextColor="#999"
+              value={userDetails.email}
             />
           </View>
 
@@ -77,16 +130,7 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
               style={styles.input}
               placeholderTextColor="#999"
               keyboardType="phone-pad"
-            />
-          </View>
-
-          <View style={styles.inputWrapper}>
-            <Feather name="lock" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput
-              placeholder="Password"
-              style={styles.input}
-              placeholderTextColor="#999"
-              secureTextEntry
+              value={userDetails.phoneNumber}
             />
           </View>
         </View>
@@ -121,7 +165,10 @@ const ProfilePage = ({setting, setSettings,toggleSettings}) => {
     </SafeAreaView>
   );
 };
+// End of UI elements
 
+
+// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
