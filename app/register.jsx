@@ -7,12 +7,11 @@ import {Stack} from "expo-router";
 import { Link } from "expo-router";
 import { ScrollView } from "react-native";
 import { TextInput } from "react-native";
-import { auth } from "../Config/firebase";
+import { auth,db } from "../Config/firebase";
 import Toast from 'react-native-toast-message';
 import {createUserWithEmailAndPassword} from "firebase/auth"
+import { doc, setDoc } from "firebase/firestore"; // Firestore functions
 
-
-// array that holds 2 strings rendered in the button
 export default function RegisterScreen() {
   
   
@@ -36,8 +35,17 @@ export default function RegisterScreen() {
   
     setLoading(true); // Show loader
     try {
+      // Attempt to create a new user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+  
+      // Save additional user details in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fullName,
+        phoneNumber,
+        email: user.email,
+        createdAt: new Date().toISOString(),
+      });
   
       // Success toast
       Toast.show({
@@ -51,12 +59,21 @@ export default function RegisterScreen() {
         router.push("/login");
       }, 2000); // Delay navigation to allow the success toast to be visible
     } catch (error) {
-      // Error toast
-      Toast.show({
-        type: "error",
-        text1: "Registration Failed",
-        text2: error.message,
-      });
+      if (error.code === "auth/email-already-in-use") {
+        // Specific handling for email already in use
+        Toast.show({
+          type: "error",
+          text1: "Registration Failed",
+          text2: "This email is already registered. Please log in or use a different email.",
+        });
+      } else {
+        // General error handling
+        Toast.show({
+          type: "error",
+          text1: "Registration Failed",
+          text2: error.message,
+        });
+      }
     } finally {
       // Ensure the loader remains visible for at least 2 seconds
       setTimeout(() => {

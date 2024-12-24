@@ -11,6 +11,8 @@ import { auth } from "../Config/firebase";
 import {signInWithEmailAndPassword} from "firebase/auth"
 import Toast from "react-native-toast-message";
 
+
+
 // array that holds 2 strings rendered in the button
 const buttonText = [
   "Record, relive, and share",
