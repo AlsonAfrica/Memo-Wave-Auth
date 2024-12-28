@@ -38,6 +38,11 @@ This project builds upon the previous Digital Journal App to create an enhanced 
 
 ![image](https://github.com/user-attachments/assets/221c50bb-961f-4a9d-bd36-409f1ec5f64c)
 
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/birthday-card-app.git
 
 
 
