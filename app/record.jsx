@@ -30,6 +30,7 @@ import { db } from '../Config/firebase';
 import { doc, getDoc,updateDoc } from "firebase/firestore";
 
 
+
 export default function RecordingScreen() {
 
   // STATES
@@ -38,6 +39,8 @@ export default function RecordingScreen() {
   const [loading, setloading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [settings, setSettings] = useState("recording-screen");
+  const [timer,setTimer] = useState(0);
+  const [intervalid, setIntervalId] = useState(null)
   const [userDetails, setUserDetails] = useState({ email: "", phoneNumber: "" });
 
   
@@ -132,20 +135,25 @@ export default function RecordingScreen() {
   async function startRecording() {
     try {
       const permission = await Audio.requestPermissionsAsync();
-      if (permission.status === "granted") {
+      if (permission.status === 'granted') {
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
         });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
+        const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
         setRecording(recording);
+
+        const id = setInterval(()=>{
+          setTimer((prev)=>prev+1)
+        },1000)
+        setIntervalId(id)
       }
     } catch (error) {
-      console.error("Error starting recording:", error);
+      console.error('Error starting recording:', error);
     }
   }
+
+
   useEffect(() => {
     const loadRecordings = async () => {
       try {
@@ -203,6 +211,10 @@ export default function RecordingScreen() {
         text2: "Your recording has been successfully saved.",
         position: "top",
       });
+
+      clearInterval(intervalid);
+      setIntervalId(null);
+      setTimer(0);
 
       setRecording(null);
     } catch (error) {
@@ -294,8 +306,8 @@ export default function RecordingScreen() {
   // Function to delete a recording by index
   const deleteRecording = async (index) => {
     Alert.alert(
-      `Delete Recording #${index + 1}`, // Display a clear message with recording number
-      "Are you sure you want to delete this recording?", // Additional confirmation text
+      `Delete Recording #${index + 1}`,
+      "Are you sure you want to delete this recording?",
       [
         {
           text: "Yes",
@@ -304,33 +316,34 @@ export default function RecordingScreen() {
               const updatedRecordings = prevRecordings.filter(
                 (_, i) => i !== index
               );
-
-              // Update AsyncStorage with the new list
+  
               AsyncStorage.setItem(
                 "recordings",
                 JSON.stringify(updatedRecordings)
               ).catch((error) =>
                 console.error("Error updating AsyncStorage:", error)
               );
-
+  
               return updatedRecordings;
             });
-            //  Toaster Positioning
-            Toast.show({
-              type: "success",
-              text1: "Recording Deleted!",
-              text2: "Your recording has been successfully Deleted.",
-              position: "top",
-            });
-
-            console.log(`Recording #${index + 1} deleted`); // Log the deletion
+  
+            setTimeout(() => {
+              Toast.show({
+                type: "success",
+                text1: "Recording Deleted",
+                text2: "Your recording has been successfully Deleted.",
+                position: "top",
+              });
+            }, 100);
+  
+            console.log(`Recording #${index + 1} deleted`);
           },
-          style: "destructive", // Optional style for emphasis on destructive action
+          style: "destructive",
         },
         {
           text: "No",
-          onPress: () => console.log("Deletion canceled"), // Log cancellation
-          style: "cancel", 
+          onPress: () => console.log("Deletion canceled"),
+          style: "cancel",
         },
       ]
     );
@@ -340,7 +353,11 @@ export default function RecordingScreen() {
     setSettings(settings === "recording-screen" ? "settings" : "recording-screen");
   };
 
-
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
 
 
   // Function to render each recording item
@@ -375,8 +392,16 @@ export default function RecordingScreen() {
         console.error("Error updating recording title:", error);
       }
     };
+
     return filteredRecordings.map((recordingLine, index) => (
-      <Pressable key={index} onLongPress={() => deleteRecording(index)}>
+      <Pressable 
+        key={index} 
+        onLongPress={() => deleteRecording(index)}
+        style={({ pressed }) => [
+          styles.recordingItem,
+          pressed && styles.recordingItemPressed
+        ]}
+      >
         <View style={styles.row}>
           {/* Editable title */}
           <View style={styles.textDate}>
@@ -385,206 +410,258 @@ export default function RecordingScreen() {
               value={recordingLine.title || `Recording #${index + 1}`}
               onChangeText={(newTitle) => updateRecordingTitle(index, newTitle)}
               placeholder="Enter title"
+              placeholderTextColor="#94A3B8"
             />
             <Text style={styles.metadata}>
               {recordingLine.duration} | {formattedDate} | {formattedTime}
             </Text>
           </View>
-          <View style={styles.buttonscontainer}>
-            <Pressable onPress={() => playSound(recordingLine.uri)}>
-              <Text>Play</Text>
+          <View style={styles.buttonsContainer}>
+            <Pressable 
+              onPress={() => playSound(recordingLine.uri)} 
+              style={styles.iconButton}
+            >
+              <Feather name="play" size={20} color="#6366F1" />
             </Pressable>
             {/* Share button */}
-            <Pressable onPress={() => shareRecording(recordingLine)}>
-              <EvilIcons name="share-apple" size={20} color="black" />
+            <Pressable 
+              onPress={() => shareRecording(recordingLine)} 
+              style={styles.iconButton}
+            >
+              <Feather name="share" size={20} color="#6366F1" />
             </Pressable>
-            {/* <Pressable>
-              <Ionicons name="ellipsis-vertical" size={15} color="black" />
-            </Pressable> */}
           </View>
         </View>
       </Pressable>
     ));
-  }
-
-
-
-
-
-  // FRONT END LAYOUT
-  return ( 
-    <>
-    {settings === "recording-screen" ? (
-        <SafeAreaView style={styles.safeAreaView}>
-        <StatusBar style="Dark" />
-        <ScrollView style={styles.recordingListContainer}>
-          <View>
-            <Toast />
-            <View style={styles.topcontainer}>
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  marginTop: 20,
-                }}
-              >
-                Your Recordings
-              </Text>
-              <Pressable style={styles.settingsbutton} onPress={toggleSettings}>
-                <Feather name="settings" size={24} color="black" />
-              </Pressable>
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Search Recordings..."
-              value={searchQuery}
-              onChangeText={(text) => setSearchQuery(text)}
-            />
-            {getRecordingLines()}
-            {loading && <ActivityIndicator size="large" color="#5AB8A6" />}
-          </View>
-        </ScrollView>
-        {/* Control buttons */}
-        <View style={styles.container}>
-          <Pressable
-            style={styles.button}
-            onPress={recording ? stopRecording : startRecording}
-          >
-            <Text style={styles.buttonText}>
-              {recording ? (
-                <FontAwesome6 name="pause" size={20} color="white" />
-              ) : (
-                <Octicons name="dot-fill" size={36} color="red" />
-              )}
-            </Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    ):
-
-    // Profile page conditionally rendered
-    (
-      <ProfilePage
-      settings={settings}
-      setSettings={setSettings}
-      toggleSettings={toggleSettings}
-      userDetails={userDetails}
-      updateUserDetails={updateUserDetails}
-      setUserDetails={setUserDetails}
-      />
-    )}
-    </>
-  );
-}
-// END FRONT END LAYOUT
-
-
-
-// Syles
-const styles = StyleSheet.create({
-  safeAreaView: {
-    flex: 1,
-    backgroundColor: "#5AB8A6",
-    alignItems: "center",
-  },
-  container: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 40,
-    width: 40, 
-    alignSelf: "center",
-  },
-  button: {
-    padding: 15,
-    backgroundColor: "#1e90ff",
-    borderRadius: 5,
-    marginVertical: 10,
-    borderRadius: "50%",
-    height: 50,
-    width: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-  },
-  buttonText: {
-    color: "white",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 80,
-    gap: 15,
-    width: "100%",
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: "#f0f0f0",
-    marginTop: 10,
-  },
-  fill: {
-    flex: 1,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    padding: 5,
-  },
-  recordingListContainer: {
-    flex: 1,
-    marginTop: 20,
-    marginBottom: 130,
-    borderRadius: 20,
-    width: "90%",
-    backgroundColor: "white",
-    paddingHorizontal: 20,
-
-    // Shadow for iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-
-    // Shadow for Android
-    elevation: 10,
-  },
-  backbutton: {
-    margin: 10,
-    marginHorizontal: -10,
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    fontSize: 16,
-    borderWidth: 2,
-    marginTop: 10,
-    borderRadius: "20px",
-    padding: 7,
-    width: "100%",
-    borderColor: "#5AB8A6",
-  },
-  recordInput: {
-    width: 100,
-  },
-  textDate: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  buttonscontainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  topcontainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
+    }
     
-  },
-  settingsbutton: {
-    marginTop: 20,
-  },
-
-});
-// End
+    // FRONT END LAYOUT
+    return (
+      <>
+        {settings === "recording-screen" ? (
+          <SafeAreaView style={styles.safeAreaView}>
+            <StatusBar style="light" />
+            
+            <View style={styles.mainContainer}>
+              <ScrollView style={styles.recordingListContainer}>
+                <View>
+                 
+                  <View style={styles.topContainer}>
+                    <Text style={styles.headerText}>Your Recordings</Text>
+                    <Pressable 
+                      style={styles.settingsButton} 
+                      onPress={toggleSettings}
+                    >
+                      <Feather name="settings" size={24} color="#FFFFFF" />
+                    </Pressable>
+                  </View>
+                  
+                  <View style={styles.searchContainer}>
+                    <Feather name="search" size={20} color="#6366F1" style={styles.searchIcon} />
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search recordings..."
+                      placeholderTextColor="#94A3B8"
+                      value={searchQuery}
+                      onChangeText={(text) => setSearchQuery(text)}
+                    />
+                  </View>
+                  <Toast/>
+                  {getRecordingLines()}
+                  {loading && (
+                    <View style={styles.loaderContainer}>
+                      <ActivityIndicator size="large" color="#6366F1" />
+                    </View>
+                  )}
+                </View>
+              </ScrollView>
+    
+              {/* Recording Controls */}
+              <View style={styles.controlsContainer}>
+                <Text style={styles.timer}>{formatTime(timer)}</Text>
+                <Pressable
+                  style={[
+                    styles.recordButton,
+                    recording && styles.recordingActive
+                  ]}
+                  onPress={recording ? stopRecording : startRecording}
+                >
+                  {recording ? (
+                    <FontAwesome6 name="pause" size={24} color="white" />
+                  ) : (
+                    <Octicons name="dot-fill" size={40} color="white" />
+                  )}
+                </Pressable>
+              </View>
+            </View>
+          </SafeAreaView>
+        ) : (
+          <ProfilePage
+            settings={settings}
+            setSettings={setSettings}
+            toggleSettings={toggleSettings}
+            userDetails={userDetails}
+            updateUserDetails={updateUserDetails}
+            setUserDetails={setUserDetails}
+          />
+        )}
+      </>
+    )};
+    
+    const styles = StyleSheet.create({
+      safeAreaView: {
+        flex: 1,
+        backgroundColor: '#0F172A', // Dark background for modern look
+      },
+      mainContainer: {
+        flex: 1,
+        backgroundColor: '#0F172A',
+      },
+      topContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 15,
+      },
+      headerText: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        letterSpacing: 0.5,
+      },
+      settingsButton: {
+        padding: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      recordingListContainer: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 100,
+        backgroundColor: '#1E293B', // Darker container for contrast
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        paddingTop: 16,
+      },
+      searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#334155',
+        borderRadius: 20,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        paddingHorizontal: 16,
+        height: 56,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+      searchIcon: {
+        marginRight: 12,
+      },
+      searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#FFFFFF',
+        fontWeight: '500',
+      },
+      recordingItem: {
+        backgroundColor: '#334155',
+        borderRadius: 20,
+        marginHorizontal: 16,
+        marginBottom: 12,
+        padding: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+      recordingItemPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.98 }],
+      },
+      row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
+      textDate: {
+        flex: 1,
+      },
+      recordInput: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 4,
+      },
+      metadata: {
+        fontSize: 14,
+        color: '#94A3B8',
+      },
+      buttonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 16,
+      },
+      iconButton: {
+        padding: 8,
+        borderRadius: 12,
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+      },
+      controlsContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#1E293B',
+        paddingVertical: 24,
+        paddingHorizontal: 30,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 10,
+      },
+      timer: {
+        fontSize: 36,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 20,
+        letterSpacing: 2,
+      },
+      recordButton: {
+        height: 72,
+        width: 72,
+        borderRadius: 36,
+        backgroundColor: '#EF4444',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#EF4444',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+      },
+      recordingActive: {
+        backgroundColor: '#6366F1',
+        shadowColor: '#6366F1',
+      },
+      loaderContainer: {
+        padding: 20,
+        alignItems: 'center',
+      },
+    });
